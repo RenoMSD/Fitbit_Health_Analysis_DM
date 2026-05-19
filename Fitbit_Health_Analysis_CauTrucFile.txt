@@ -1,0 +1,56 @@
+Fitbit_Health_Analysis/
+│
+├── README.md                          			<-- (File text) Giới thiệu dự án, hướng dẫn chạy code.
+├── requirements.txt                   			<-- (File text) Danh sách thư viện cần cài đặt (pandas, xgboost, mlxtend...).
+│
+├── data/
+│   ├── Fitabase Data 4.12.16-5.12.16/          	<-- Chứa dữ liệu gốc CHƯA ĐỤNG VÀO TỪ KAGGLE.
+│   │   ├── dailyActivity_merged.csv   
+│   │   ├── sleepDay_merged.csv
+│   │   └── hourlySteps_merged.csv     			<-- (Tùy chọn thêm để phân tích EDA)
+│   │
+│   └── processed/                     	<-- Phân chia theo từng phiên bản để dễ dàng Rollback.
+│       │
+│       ├── v1_baseline/               			<-- Output của Notebook 01.
+│       │   ├── master_daily_v1.csv    			<-- Dữ liệu sạch, đã merge Activity và Sleep.
+│       │   └── transaction_v1.csv     			<-- Dữ liệu đã rời rạc hóa (Binning) dạng One-hot cho FP-Growth.
+│       │
+│       ├── v2_feature_engineered/     			<-- Output của Notebook 03 (Clustering).
+│       │   └── master_daily_with_clusters_v2.csv 	<-- Bản v1 được gắn thêm cột "Cluster_Label" (Nhóm lối sống).
+│       │
+│       └── v3_model_specific/         			<-- Output xử lý cục bộ tại Notebook 04 & 05.
+│           ├── class_smote_data_v3.csv      		<-- Dữ liệu đã cân bằng (SMOTE) cho Classification.
+│           └── reg_no_outliers_data_v3.csv  		<-- Dữ liệu đã cắt bỏ Outlier khắt khe cho Regression.
+│
+├── notebooks/                         <-- Chứa code chính, có đánh số thứ tự thực thi.
+│   ├── 01_Data_Wrangling_and_EDA.ipynb
+│   ├── 02_Association_Rules.ipynb       		<-- Input: transaction_v1.csv
+│   ├── 03_Clustering_Lifestyle.ipynb    		<-- Input: master_daily_v1.csv | Output: ..._v2.csv
+│   ├── 04_Classification_Active_Day.ipynb 		<-- Input: ..._v2.csv | Output: SMOTE data (nếu cần) & Model.
+│   └── 05_Regression_Calories_Predict.ipynb 		<-- Input: ..._v2.csv | Output: No_outliers data & Model.
+│
+├── models/                            <-- Lưu file mô hình đã huấn luyện (để tái sử dụng không cần train lại).
+│   ├── classification/
+│   │   ├── xgb_best_model.pkl         			<-- Mô hình XGBoost tốt nhất.
+│   │   └── scaler_class.pkl           			<-- Bộ scale dữ liệu (VD: MinMaxScaler) dùng riêng cho Classification.
+│   │
+│   ├── regression/
+│   │   ├── lgbm_reg_model.pkl         			<-- Mô hình LightGBM tốt nhất.
+│   │   └── scaler_reg.pkl             
+│   │
+│   └── unsupervised/
+│       └── fp_growth_rules.csv        			<-- Bảng chứa các luật kết hợp (Rules) có ý nghĩa nhất đã lọc ra.
+│
+├── reports/                           <-- Nơi xuất file kết quả (Báo cáo, Biểu đồ).
+│   ├── figures/                       <-- Lưu ảnh biểu đồ tự động xuất từ code.
+│   │   ├── eda_correlation_matrix.png
+│   │   ├── clustering_scatter_plot.png
+│   │   ├── xgb_feature_importance.png
+│   │   └── lgbm_actual_vs_predict.png
+│   └── final_report.pdf               <-- Báo cáo tổng kết dự án.
+│
+└── utils/                             <-- Chứa các hàm dùng chung (Đỡ phải viết lại code nhiều lần).
+    ├── __init__.py                    <-- Biến thư mục này thành module Python.
+    ├── data_helpers.py                <-- Hàm tự viết: load dữ liệu, đồng bộ ngày tháng, xử lý missing.
+    ├── model_eval.py                  <-- Hàm tự viết: in ra Accuracy, vẽ Confusion Matrix, tính RMSE.
+    └── plot_styles.py                 <-- Hàm tự viết: setup màu sắc, font chữ chuẩn cho biểu đồ seaborn/matplotlib.
